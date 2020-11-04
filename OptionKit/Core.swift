@@ -48,6 +48,11 @@ public enum OptionTrigger : Equatable, CustomDebugStringConvertible, Hashable {
             return self.usageDescription.hashValue
         }
     }
+    
+    public func hash(into hasher: inout Hasher) {
+            
+        }
+
 }
 
 /// Describes an option for the parser.
@@ -94,7 +99,7 @@ public struct Option : Equatable, CustomStringConvertible, CustomDebugStringConv
     }
     
     static func isValidOptionString(_ str:String) -> Bool{
-        let length = str.characters.count
+        let length = str.count
         if length < 2 {
             return false
         }
@@ -104,11 +109,11 @@ public struct Option : Equatable, CustomStringConvertible, CustomDebugStringConv
                 return false
             }
             
-            return str[str.characters.index(str.startIndex, offsetBy: 1)] != "-"
+            return str[str.index(str.startIndex, offsetBy: 1)] != "-"
         }
 
         /* Okay, count greater than 2. Full option! */
-        return str[str.startIndex ... str.characters.index(str.startIndex, offsetBy: 1)] == "--"
+        return str[str.startIndex ... str.index(str.startIndex, offsetBy: 1)] == "--"
     }
 
     public var description: String {
@@ -128,6 +133,11 @@ public struct Option : Equatable, CustomStringConvertible, CustomDebugStringConv
             return self.debugDescription.hashValue
         }
     }
+    
+    public func hash(into hasher: inout Hasher) {
+            
+        }
+
 }
 
 private struct OptionData : Equatable, CustomStringConvertible, CustomDebugStringConvertible {
@@ -199,7 +209,7 @@ public struct OptionParser {
         
         // The leading string, to properly indent.
         var leadingString = "       "
-        for _ in 0..<commandName.characters.count {
+        for _ in 0..<commandName.count {
             leadingString += " "
         }
         leadingString += " "
@@ -207,8 +217,8 @@ public struct OptionParser {
         // Now compute the string!
         return self.definitions.reduce(["usage: \(commandName)"]) { lines, optDef in
             let nextDescription = optDef.trigger.usageDescription
-            let additionalCharacters = nextDescription.characters.count + 1 // +1 for the space
-            if (lines.last!).characters.count < maximumLineWidth - additionalCharacters {
+            let additionalCharacters = nextDescription.count + 1 // +1 for the space
+            if (lines.last!).count < maximumLineWidth - additionalCharacters {
                 return lines[0..<lines.count - 1] + [lines.last! + " " + nextDescription]
             }
             
@@ -293,12 +303,12 @@ public struct OptionParser {
     
     static func normalizeParameters(_ parameters:[String]) -> [String] {
         return parameters.reduce([String]()) { memo, next in
-            let index = next.characters.index(next.startIndex, offsetBy: 0)
+            let index = next.index(next.startIndex, offsetBy: 0)
             if next[index] != "-" {
                 return memo + [next]
             }
             
-            let secondIndex = next.characters.index(index, offsetBy: 1)
+            let secondIndex = next.index(index, offsetBy: 1)
             if next[secondIndex] == "-" {
                 /* Assume everything that follows is valid. */
                 return memo + [next]
@@ -306,7 +316,7 @@ public struct OptionParser {
             
             /* Okay, we have one or more single-character flags. */
             var params = [String]()
-            for char in next[secondIndex..<next.characters.index(next.startIndex, offsetBy: 2)].characters {
+            for char in next[secondIndex..<next.index(next.startIndex, offsetBy: 2)]{
                 params += ["-\(char)"]
             }
             
